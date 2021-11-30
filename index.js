@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const ObjectId = require("mongodb").ObjectId;
 
 require("dotenv").config();
 
@@ -22,6 +23,7 @@ async function run() {
     const database = client.db("portfolio");
     const aboutCollection = database.collection("aboutInfo");
     const projectsCollection = database.collection("projects");
+    const projectDetailsCollection = database.collection("projectDetails");
 
     app.get("/about", async (req, res) => {
       const cursor = aboutCollection.find({});
@@ -33,6 +35,19 @@ async function run() {
       const cursor = projectsCollection.find({});
       const projects = await cursor.toArray();
       res.send(projects);
+    });
+
+    app.get("/projectdetails", async (req, res) => {
+      const cursor = projectDetailsCollection.find({});
+      const projectDetails = await cursor.toArray();
+      res.send(projectDetails);
+    });
+
+    app.get("/projectdetails/:title", async (req, res) => {
+      const title = req.params.title;
+      const query = { title: title };
+      const singleProjectDetail = await projectDetailsCollection.findOne(query);
+      res.send(singleProjectDetail);
     });
   } finally {
     // await client.close();
